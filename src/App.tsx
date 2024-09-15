@@ -58,10 +58,6 @@ const YourComponent: React.FC = () => {
   },[page])
 
 
-  // const onPageChange = (event: DataTableStateEvent) => {
-  //   setPage(event.page! + 1); // Update the current page (PrimeReact is zero-based, so add 1)
-  // };
-
   const onPageChange = (event : DataTableStateEvent) => {
     setPage(event.page! + 1);
   }
@@ -153,9 +149,10 @@ const YourComponent: React.FC = () => {
     op.current?.hide(); // Hide OverlayPanel after submission
   };
 
-  // Handle button click to toggle the OverlayPanel
-  const handleButtonClick = (e: React.MouseEvent<SVGElement, MouseEvent>) => {
-    op.current?.toggle(e); // Pass the event to toggle
+  
+
+  const handleButtonClick = (e : React.MouseEvent<SVGAElement, MouseEvent>) => {
+    op.current?.toggle(e);
   };
 
   // Render header with checkbox
