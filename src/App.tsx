@@ -144,9 +144,10 @@ const YourComponent: React.FC = () => {
       []
     );
 
-    // Update the selected products state with the final list
-    setSelectedProducts(selected);
-    op.current?.hide(); // Hide OverlayPanel after submission
+  
+
+  setSelectedProducts(selected);
+  op.current?.hide();
   };
 
   
@@ -155,15 +156,14 @@ const YourComponent: React.FC = () => {
     op.current?.toggle(e);
   };
 
-  // Render header with checkbox
-  // Render header with checkbox and icon for better UI/UX
+  
   const renderCheckboxHeader = () => {
     return (
       <div
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          display : "flex",
+          alignItems : "center",
+          justifyContent : "center",
         }}
       >
         {/* Checkbox for "Select All" functionality */}
@@ -172,29 +172,30 @@ const YourComponent: React.FC = () => {
           checked={selectAll}
           onChange={handleSelectAllChange}
           style={{
-            marginRight: "8px", // Space between checkbox and icon
-            width: "18px", // Adjust checkbox size for better alignment
-            height: "18px",
-            cursor: "pointer",
+
+            marginRight : "8px",
+            width : "18px",
+            height : "18px",
+            cursor : "pointer",
           }}
         />
         {/* Icon for dropdown with hover effect */}
         <FaAngleDown
           style={{
-            color: "#007bff", // Use a primary color for the icon
-            fontSize: "1.5em", // Adjust the icon size
-            cursor: "pointer", // Make the icon clickable
-            transition: "color 0.2s ease-in-out", // Smooth transition effect
+            color: "#007bff", 
+            fontSize: "1.5em", 
+            cursor: "pointer", 
+            transition: "color 0.2s ease-in-out",
           }}
-          onClick={handleButtonClick} // Toggle the OverlayPanel on click
-          onMouseEnter={(e) => (e.currentTarget.style.color = "#0056b3")} // Hover effect
-          onMouseLeave={(e) => (e.currentTarget.style.color = "#007bff")} // Return to original color after hover
+          onClick={handleButtonClick} 
+          onMouseEnter={(e) => (e.currentTarget.style.color = "#0056b3")} 
+          onMouseLeave={(e) => (e.currentTarget.style.color = "#007bff")} 
         />
       </div>
     );
   };
 
-  // Render checkbox in each row
+ 
   const rowCheckboxBodyTemplate = (rowData: Artwork) => {
     return (
       <input
@@ -214,23 +215,23 @@ const YourComponent: React.FC = () => {
               <DataTable
                 value={products}
                 paginator
-                first={(page - 1) * rows} // Calculate the first record for the current page
-                rows={rows} // Set rows per page to 12
-                totalRecords={totalRecords} // Total records from API
-                lazy // Server-side pagination enabled
-                onPage={onPageChange} // Trigger API call when the page changes
-                loading={loading} // Show loading indicator while fetching data
+                first={(page - 1) * rows}
+                rows={rows} 
+                totalRecords={totalRecords} 
+                lazy 
+                onPage={onPageChange} 
+                loading={loading} 
                 dataKey="id"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
                 className="p-datatable-customers"
-                selectionMode="multiple" // Enable row selection with checkboxes
-                selection={selectedProducts} // Pass selected products
-                onSelectionChange={onSelectionChange} // Handle row selection change
+                selectionMode="multiple" 
+                selection={selectedProducts} 
+                onSelectionChange={onSelectionChange} 
               >
                 <Column
-                  body={rowCheckboxBodyTemplate} // Define the body template for row checkboxes
-                  header={renderCheckboxHeader} // Define the header with checkbox and icon
-                  headerStyle={{ width: "6rem" }} // Adjust width for checkbox column
+                  body={rowCheckboxBodyTemplate} 
+                  header={renderCheckboxHeader} 
+                  headerStyle={{ width: "6rem" }}
                 />
                 <Column field="title" header="Title" />
                 <Column field="place_of_origin" header="Place of Origin" />
@@ -246,12 +247,12 @@ const YourComponent: React.FC = () => {
       <OverlayPanel
         ref={op}
         style={{
-          padding: "20px", // Existing padding
-          maxWidth: "300px", // Existing width
-          border: "1px solid #ced4da", // Border for the panel
-          borderRadius: "10px", // Rounded corners
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
-          backgroundColor: "#fff", // Background color for contrast
+          padding: "20px", 
+          maxWidth: "300px", 
+          border: "1px solid #ced4da", 
+          borderRadius: "10px", 
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", 
+          backgroundColor: "#fff",
         }}
       >
         {/* Flex container for input and button */}
