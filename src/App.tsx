@@ -214,7 +214,7 @@ const YourComponent: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const rows = 12;
 
-  const [selectedProducts, setSelectedProducts] = useState<Artwork[]>([]); // Selected rows (checkbox)
+  const [selectedProducts, setSelectedProducts] = useState<Artwork[]>([]); 
   const [selectAll,setSelectAll] = useState<boolean>(false);
   
   const op = useRef<OverlayPanel>(null);
@@ -236,10 +236,14 @@ const YourComponent: React.FC = () => {
     setLoading(false);
   }
 
-  // Fetch data whenever the page changes
+  
+  // useEffect(() => {
+  //   fetchData(page); // Fetch data for the current page
+  // }, [page]);
+
   useEffect(() => {
-    fetchData(page); // Fetch data for the current page
-  }, [page]);
+    fetchData(page);
+  },[page])
 
   // Handle page change (pagination)
   const onPageChange = (event: DataTableStateEvent) => {
