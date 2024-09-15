@@ -211,35 +211,30 @@ const YourComponent: React.FC = () => {
   const [products,setProducts] = useState<Artwork[]>([])
   const [totalRecords,setTotalRecords] = useState<number>(0);
   const [loading,setLoading] = useState<boolean>(false);
-  // const [page, setPage] = useState<number>(1); // Current page
   const [page, setPage] = useState<number>(1);
-  // const rows = 12; // Rows per page constant (set to 12)
   const rows = 12;
 
   const [selectedProducts, setSelectedProducts] = useState<Artwork[]>([]); // Selected rows (checkbox)
-
-  // const [selectAll, setSelectAll] = useState<boolean>(false); // State for "Select All" checkbox
   const [selectAll,setSelectAll] = useState<boolean>(false);
-  // const op = useRef<OverlayPanel>(null); // Create a ref for OverlayPanel
+  
   const op = useRef<OverlayPanel>(null);
-  // const [inputValue, setInputValue] = useState<string>(""); // State for input value
   const [inputValue, setInputValue] = useState<string>("");
 
-  // Function to fetch data from the API based on the current page
-  const fetchData = async (page: number) => {
+
+  const fetchData = async (page : number) => {
     setLoading(true);
-    try {
+    try{
       const response = await fetch(
         `https://api.artic.edu/api/v1/artworks?page=${page}&limit=${rows}`
       );
       const data = await response.json();
-      setProducts(data.data); // Set artworks data
-      setTotalRecords(data.pagination.total); // Total number of records
-    } catch (error) {
-      console.error("Error fetching data:", error);
+      setProducts(data.data);
+      setTotalRecords(data.pagination.total);
+    }catch(error){
+      console.error('Error fetching data : ', error);
     }
     setLoading(false);
-  };
+  }
 
   // Fetch data whenever the page changes
   useEffect(() => {
