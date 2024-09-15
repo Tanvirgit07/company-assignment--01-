@@ -1,189 +1,3 @@
-// import React, { useState, useEffect, useRef } from 'react';
-// import { DataTable, DataTableStateEvent } from 'primereact/datatable';
-// import { Column } from 'primereact/column';
-// import { Card } from 'primereact/card';
-// import { Container, Row, Col } from 'react-bootstrap';
-// import { Button } from 'primereact/button';
-// import { OverlayPanel } from 'primereact/overlaypanel';
-// import { FaAngleDown } from 'react-icons/fa';
-// import 'primereact/resources/themes/saga-blue/theme.css';
-// import 'primereact/resources/primereact.min.css';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import './App.css';
-
-// interface Artwork {
-//     id: number;
-//     title: string;
-//     place_of_origin: string;
-//     artist_display: string;
-//     inscriptions: string;
-//     date_start: string;
-//     date_end: string;
-// }
-
-// const YourComponent: React.FC = () => {
-//     const [products, setProducts] = useState<Artwork[]>([]);
-//     const [totalRecords, setTotalRecords] = useState<number>(0);
-//     const [loading, setLoading] = useState<boolean>(false);
-//     const [page, setPage] = useState<number>(1); // Current page
-//     const rows = 12; // Rows per page constant (set to 12)
-//     const [selectedProducts, setSelectedProducts] = useState<Artwork[]>([]); // Selected rows (checkbox)
-//     const [selectAll, setSelectAll] = useState<boolean>(false); // State for "Select All" checkbox
-//     const op = useRef<OverlayPanel>(null); // Create a ref for OverlayPanel
-//     const [inputValue, setInputValue] = useState<string>(''); // State for input value
-
-//     // Function to fetch data from the API based on the current page
-//     const fetchData = async (page: number) => {
-//         setLoading(true);
-//         try {
-//             const response = await fetch(`https://api.artic.edu/api/v1/artworks?page=${page}&limit=${rows}`);
-//             const data = await response.json();
-//             setProducts(data.data); // Set artworks data
-//             setTotalRecords(data.pagination.total); // Total number of records
-//         } catch (error) {
-//             console.error('Error fetching data:', error);
-//         }
-//         setLoading(false);
-//     };
-
-//     // Fetch data whenever the page changes
-//     useEffect(() => {
-//         fetchData(page); // Fetch data for the current page
-//     }, [page]);
-
-//     // Handle page change (pagination)
-//     const onPageChange = (event: DataTableStateEvent) => {
-//         setPage(event.page! + 1); // Update the current page (PrimeReact is zero-based, so add 1)
-//     };
-
-//     // Row selection handler for checkboxes
-//     const onSelectionChange = (e: { value: Artwork[] }) => {
-//         setSelectedProducts(e.value); // Update the selected rows
-//         setSelectAll(e.value.length === products.length); // Update "Select All" checkbox state
-//     };
-
-//     // Handle checkbox change in each row
-//     const handleCheckboxChange = (rowData: Artwork) => {
-//         const isSelected = selectedProducts.some((product) => product.id === rowData.id);
-//         if (isSelected) {
-//             setSelectedProducts(selectedProducts.filter((product) => product.id !== rowData.id));
-//         } else {
-//             setSelectedProducts([...selectedProducts, rowData]);
-//         }
-//     };
-
-//     // Handle "Select All" checkbox change
-//     const handleSelectAllChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-//         if (event.target.checked) {
-//             setSelectedProducts(products); // Select all products
-//         } else {
-//             setSelectedProducts([]); // Deselect all products
-//         }
-//         setSelectAll(event.target.checked); // Update "Select All" checkbox state
-//     };
-
-//     // Handle input change
-//     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//         setInputValue(e.target.value);
-//     };
-
-//     // Handle submit
-//     const handleSubmit = () => {
-//         console.log('Input Value:', inputValue);
-//         // Add form submission logic here
-//         op.current?.hide(); // Hide OverlayPanel after submission
-//     };
-
-//     // Handle button click to toggle the OverlayPanel
-//     const handleButtonClick = (e: React.MouseEvent<SVGElement, MouseEvent>) => {
-//         op.current?.toggle(e); // Pass the event to toggle
-//     };
-
-//     // Render header with checkbox
-//     const renderCheckboxHeader = () => {
-//         return (
-//             <div style={{ display: 'flex', alignItems: 'center' }}>
-//                 <input
-//                     type="checkbox"
-//                     checked={selectAll}
-//                     onChange={handleSelectAllChange}
-//                     style={{ marginRight: '10px' }} // Space between checkbox and icon
-//                 />
-//                 <FaAngleDown
-//                     style={{ color: 'black', fontSize: '1.2em', cursor: 'pointer' }}
-//                     onClick={handleButtonClick} // Toggle OverlayPanel on click
-//                 />
-//             </div>
-//         );
-//     };
-
-//     // Render checkbox in each row
-//     const rowCheckboxBodyTemplate = (rowData: Artwork) => {
-//         return (
-//             <input
-//                 type="checkbox"
-//                 checked={selectedProducts.some((product) => product.id === rowData.id)}
-//                 onChange={() => handleCheckboxChange(rowData)}
-//             />
-//         );
-//     };
-
-//     return (
-//         <Container fluid>
-//             <Row>
-//                 <Col xs={12}>
-//                     <Card title="Artworks" className="p-mb-4">
-//                         <div className="datatable-container">
-//                             <DataTable
-//                                 value={products}
-//                                 paginator
-//                                 first={(page - 1) * rows} // Calculate the first record for the current page
-//                                 rows={rows} // Set rows per page to 12
-//                                 totalRecords={totalRecords} // Total records from API
-//                                 lazy // Server-side pagination enabled
-//                                 onPage={onPageChange} // Trigger API call when the page changes
-//                                 loading={loading} // Show loading indicator while fetching data
-//                                 dataKey="id"
-//                                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
-//                                 className="p-datatable-customers"
-//                                 selectionMode="multiple" // Enable row selection with checkboxes
-//                                 selection={selectedProducts} // Pass selected products
-//                                 onSelectionChange={onSelectionChange} // Handle row selection change
-//                             >
-//                                 <Column
-//                                     body={rowCheckboxBodyTemplate} // Define the body template for row checkboxes
-//                                     header={renderCheckboxHeader} // Define the header with checkbox and icon
-//                                     headerStyle={{ width: '6rem' }} // Adjust width for checkbox column
-//                                 />
-//                                 <Column field="title" header="Title" />
-//                                 <Column field="place_of_origin" header="Place of Origin" />
-//                                 <Column field="artist_display" header="Artist" />
-//                                 <Column field="inscriptions" header="Inscriptions" />
-//                                 <Column field="date_start" header="Start Date" />
-//                                 <Column field="date_end" header="End Date" />
-//                             </DataTable>
-//                         </div>
-//                     </Card>
-//                 </Col>
-//             </Row>
-//             <OverlayPanel ref={op}>
-//                 <div style={{ padding: '20px' }}>
-//                     <input
-//                         type="number"
-//                         value={inputValue}
-//                         onChange={handleInputChange}
-//                         placeholder="Enter row number"
-//                         style={{ marginBottom: '10px', width: '100%' }}
-//                     />
-//                     <Button className='text-black' label="Submit" icon="pi pi-check" onClick={handleSubmit} />
-//                 </div>
-//             </OverlayPanel>
-//         </Container>
-//     );
-// };
-
-// export default YourComponent;
-
 import React, { useState, useEffect, useRef } from "react";
 import { DataTable, DataTableStateEvent } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -197,14 +11,15 @@ import "primereact/resources/primereact.min.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
+
 interface Artwork {
-  id: number;
-  title: string;
-  place_of_origin: string;
-  artist_display: string;
-  inscriptions: string;
-  date_start: string;
-  date_end: string;
+  id : number;
+  title : string;
+  place_of_origin : string;
+  artist_display : string;
+  inscriptions : string;
+  date_start : string;
+  date_end : string;
 }
 
 const YourComponent: React.FC = () => {
@@ -237,15 +52,12 @@ const YourComponent: React.FC = () => {
   }
 
   
-  // useEffect(() => {
-  //   fetchData(page); // Fetch data for the current page
-  // }, [page]);
 
   useEffect(() => {
     fetchData(page);
   },[page])
 
-  // Handle page change (pagination)
+
   const onPageChange = (event: DataTableStateEvent) => {
     setPage(event.page! + 1); // Update the current page (PrimeReact is zero-based, so add 1)
   };
