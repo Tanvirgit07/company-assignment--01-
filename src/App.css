@@ -1,0 +1,36 @@
+/* CustomDataTableStyles.css */
+
+.p-datatable .p-paginator .p-paginator-page {
+    border-radius: 50%; /* Make the pagination buttons rounded */
+    background-color: #007bff; /* Customize background color */
+    color: #fff; /* Customize text color */
+    padding: 0.5rem 1rem; /* Adjust padding */
+    margin: 0 0.25rem; /* Add horizontal margin to create space between buttons */
+}
+
+.p-datatable .p-paginator .p-paginator-page:hover {
+    background-color: #0056b3; /* Customize background color on hover */
+}
+
+.p-datatable .p-paginator .p-paginator-page.p-disabled {
+    background-color: #d6d6d6; /* Customize color for disabled state */
+    color: #a6a6a6; /* Customize text color for disabled state */
+}
+
+.p-datatable .p-paginator .p-paginator-first,
+.p-datatable .p-paginator .p-paginator-prev,
+.p-datatable .p-paginator .p-paginator-next,
+.p-datatable .p-paginator .p-paginator-last {
+    border-radius: 50%; /* Make first, prev, next, and last buttons rounded */
+    background-color: #007bff; /* Customize background color */
+    color: #fff; /* Customize text color */
+    padding: 0.5rem; /* Adjust padding */
+    margin: 0 0.25rem; /* Add horizontal margin to create space between buttons */
+}
+
+.p-datatable .p-paginator .p-paginator-first:hover,
+.p-datatable .p-paginator .p-paginator-prev:hover,
+.p-datatable .p-paginator .p-paginator-next:hover,
+.p-datatable .p-paginator .p-paginator-last:hover {
+    background-color: #0056b3; /* Customize background color on hover */
+}
