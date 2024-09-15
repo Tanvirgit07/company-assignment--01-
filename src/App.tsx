@@ -58,9 +58,13 @@ const YourComponent: React.FC = () => {
   },[page])
 
 
-  const onPageChange = (event: DataTableStateEvent) => {
-    setPage(event.page! + 1); // Update the current page (PrimeReact is zero-based, so add 1)
-  };
+  // const onPageChange = (event: DataTableStateEvent) => {
+  //   setPage(event.page! + 1); // Update the current page (PrimeReact is zero-based, so add 1)
+  // };
+
+  const onPageChange = (event : DataTableStateEvent) => {
+    setPage(event.page! + 1);
+  }
 
   // Row selection handler for checkboxes
   const onSelectionChange = (e: { value: Artwork[] }) => {
