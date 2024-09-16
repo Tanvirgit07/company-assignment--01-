@@ -11,116 +11,118 @@ import "primereact/resources/primereact.min.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
-
 interface Artwork {
-  id : number;
-  title : string;
-  place_of_origin : string;
-  artist_display : string;
-  inscriptions : string;
-  date_start : string;
-  date_end : string;
+  id: number;
+  title: string;
+  place_of_origin: string;
+  artist_display: string;
+  inscriptions: string;
+  date_start: string;
+  date_end: string;
 }
 
 const YourComponent: React.FC = () => {
-  const [products,setProducts] = useState<Artwork[]>([])
-  const [totalRecords,setTotalRecords] = useState<number>(0);
-  const [loading,setLoading] = useState<boolean>(false);
+  const [products, setProducts] = useState<Artwork[]>([]);
+  const [totalRecords, setTotalRecords] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const rows = 12;
 
-  const [selectedProducts, setSelectedProducts] = useState<Artwork[]>([]); 
-  const [selectAll,setSelectAll] = useState<boolean>(false);
-  
-  const op = useRef<OverlayPanel>(null);
+  const [selectedProducts, setSelectedProducts] = useState<Artwork[]>([]);
+  const [selectAll, setSelectAll] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
 
+  const op = useRef<OverlayPanel>(null);
 
-  const fetchData = async (page : number) => {
+  
+  const fetchData = async (page: number) => {
     setLoading(true);
-    try{
+    try {
       const response = await fetch(
         `https://api.artic.edu/api/v1/artworks?page=${page}&limit=${rows}`
       );
       const data = await response.json();
       setProducts(data.data);
       setTotalRecords(data.pagination.total);
-    }catch(error){
-      console.error('Error fetching data : ', error);
+
+      // Retrieve saved selected rows from local storage
+      const savedSelection = localStorage.getItem('selectedRows');
+      if (savedSelection) {
+        const savedIds = JSON.parse(savedSelection) as number[];
+        // Maintain selection in UI based on local storage
+        const newSelection = data.data.filter((item: { id: number; }) => savedIds.includes(item.id));
+        setSelectedProducts(prev => [...prev, ...newSelection]);
+        setSelectAll(savedIds.length === data.pagination.total);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
     }
     setLoading(false);
-  }
-
-  
+  };
 
   useEffect(() => {
     fetchData(page);
-  },[page])
+  }, [page]);
 
-
-  const onPageChange = (event : DataTableStateEvent) => {
+  
+  const onPageChange = (event: DataTableStateEvent) => {
     setPage(event.page! + 1);
-  }
-
-  // Row selection handler for checkboxes
-  const onSelectionChange = (e: { value: Artwork[] }) => {
-    setSelectedProducts(e.value); // Update the selected rows
-    setSelectAll(e.value.length === products.length); // Update "Select All" checkbox state
   };
 
-  // Handle checkbox change in each row
+  const onSelectionChange = (e: { value: Artwork[] }) => {
+    setSelectedProducts(e.value);
+    setSelectAll(e.value.length === products.length);
+  };
+
+  
   const handleCheckboxChange = (rowData: Artwork) => {
     const isSelected = selectedProducts.some(
       (product) => product.id === rowData.id
     );
-    if (isSelected) {
-      setSelectedProducts(
-        selectedProducts.filter((product) => product.id !== rowData.id)
-      );
-    } else {
-      setSelectedProducts([...selectedProducts, rowData]);
-    }
+    const updatedSelection = isSelected
+      ? selectedProducts.filter((product) => product.id !== rowData.id)
+      : [...selectedProducts, rowData];
+      
+    setSelectedProducts(updatedSelection);
+
+    
   };
 
-  // Handle "Select All" checkbox change
+  
   const handleSelectAllChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (event.target.checked) {
-      setSelectedProducts(products); // Select all products
+      setSelectedProducts(products); 
     } else {
-      setSelectedProducts([]); // Deselect all products
+      setSelectedProducts([]); 
     }
-    setSelectAll(event.target.checked); // Update "Select All" checkbox state
+    setSelectAll(event.target.checked);
+
+    
   };
 
-  // Handle input change
+  
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
 
-  // Recursive function to select rows across pages
+  
   const selectRowsAcrossPages = async (
     remaining: number,
     currentPage: number,
     selected: Artwork[]
   ) => {
-    // If remaining rows to select is 0, return the selected list
     if (remaining <= 0) return selected;
 
-    // Fetch data from the current page
     const response = await fetch(
       `https://api.artic.edu/api/v1/artworks?page=${currentPage}&limit=${rows}`
     );
     const data = await response.json();
 
-    // Add the products from the current page to the selected list
     const newSelected = [...selected, ...data.data.slice(0, remaining)];
-
-    // Calculate the remaining rows to select
     const remainingRows = remaining - data.data.length;
 
-    // If more rows are needed, continue to the next page
     if (remainingRows > 0 && currentPage * rows < totalRecords) {
       return await selectRowsAcrossPages(
         remainingRows,
@@ -129,11 +131,9 @@ const YourComponent: React.FC = () => {
       );
     }
 
-    // Return the final selected list
     return newSelected;
   };
 
-  // Handle submit
   const handleSubmit = async () => {
     const numberOfRowsToSelect = parseInt(inputValue);
 
@@ -144,58 +144,54 @@ const YourComponent: React.FC = () => {
       []
     );
 
-  
+    setSelectedProducts(selected);
 
-  setSelectedProducts(selected);
-  op.current?.hide();
+    // Save selected rows to local storage
+    const selectedIds = selected.map(item => item.id);
+    localStorage.setItem('selectedRows', JSON.stringify(selectedIds));
+
+    op.current?.hide();
   };
 
-  
-
-  const handleButtonClick = (e : React.MouseEvent<SVGAElement, MouseEvent>) => {
+  const handleButtonClick = (e: React.MouseEvent<SVGAElement, MouseEvent>) => {
     op.current?.toggle(e);
   };
 
-  
   const renderCheckboxHeader = () => {
     return (
       <div
         style={{
-          display : "flex",
-          alignItems : "center",
-          justifyContent : "center",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        {/* Checkbox for "Select All" functionality */}
         <input
           type="checkbox"
           checked={selectAll}
           onChange={handleSelectAllChange}
           style={{
-
-            marginRight : "8px",
-            width : "18px",
-            height : "18px",
-            cursor : "pointer",
+            marginRight: "8px",
+            width: "18px",
+            height: "18px",
+            cursor: "pointer",
           }}
         />
-        {/* Icon for dropdown with hover effect */}
         <FaAngleDown
           style={{
-            color: "#007bff", 
-            fontSize: "1.5em", 
-            cursor: "pointer", 
+            color: "#007bff",
+            fontSize: "1.5em",
+            cursor: "pointer",
             transition: "color 0.2s ease-in-out",
           }}
-          onClick={handleButtonClick} 
-          onMouseEnter={(e) => (e.currentTarget.style.color = "#0056b3")} 
-          onMouseLeave={(e) => (e.currentTarget.style.color = "#007bff")} 
+          onClick={handleButtonClick}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "#0056b3")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "#007bff")}
         />
       </div>
     );
   };
 
- 
   const rowCheckboxBodyTemplate = (rowData: Artwork) => {
     return (
       <input
@@ -216,21 +212,21 @@ const YourComponent: React.FC = () => {
                 value={products}
                 paginator
                 first={(page - 1) * rows}
-                rows={rows} 
-                totalRecords={totalRecords} 
-                lazy 
-                onPage={onPageChange} 
-                loading={loading} 
+                rows={rows}
+                totalRecords={totalRecords}
+                lazy
+                onPage={onPageChange}
+                loading={loading}
                 dataKey="id"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
                 className="p-datatable-customers"
-                selectionMode="multiple" 
-                selection={selectedProducts} 
-                onSelectionChange={onSelectionChange} 
+                selectionMode="multiple"
+                selection={selectedProducts}
+                onSelectionChange={onSelectionChange}
               >
                 <Column
-                  body={rowCheckboxBodyTemplate} 
-                  header={renderCheckboxHeader} 
+                  body={rowCheckboxBodyTemplate}
+                  header={renderCheckboxHeader}
                   headerStyle={{ width: "6rem" }}
                 />
                 <Column field="title" header="Title" />
@@ -247,63 +243,27 @@ const YourComponent: React.FC = () => {
       <OverlayPanel
         ref={op}
         style={{
-          padding: "20px", 
-          maxWidth: "300px", 
-          border: "1px solid #ced4da", 
-          borderRadius: "10px", 
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", 
+          padding: "20px",
+          maxWidth: "300px",
+          border: "1px solid #ced4da",
+          borderRadius: "10px",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
           backgroundColor: "#fff",
         }}
       >
-        {/* Flex container for input and button */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-end",
-          }}
-        >
-          {/* Styled Input Field */}
+        <div>
           <input
             type="number"
             value={inputValue}
             onChange={handleInputChange}
-            placeholder="Enter row number"
-            style={{
-              width: "100%",
-              padding: "10px",
-              borderRadius: "8px",
-              border: "1px solid #ced4da",
-              fontSize: "1rem",
-              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-              outline: "none",
-              transition: "border-color 0.2s ease-in-out",
-              marginBottom: "15px",
-            }}
-            onFocus={(e) => (e.target.style.borderColor = "#007bff")}
-            onBlur={(e) => (e.target.style.borderColor = "#ced4da")}
+            placeholder="Number of rows"
+            style={{ marginBottom: "10px", width: "100%" }}
           />
-          {/* Styled Submit Button */}
           <Button
             label="Submit"
             icon="pi pi-check"
-            className="p-button-rounded p-button-primary"
             onClick={handleSubmit}
-            style={{
-              width: "auto",
-              padding: "10px 20px",
-              borderRadius: "8px",
-              fontSize: "1rem",
-              backgroundColor: "#007bff",
-              borderColor: "#007bff",
-              transition: "background-color 0.2s ease-in-out",
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = "#0056b3")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = "#007bff")
-            }
+            style={{ width: "100%" }}
           />
         </div>
       </OverlayPanel>
